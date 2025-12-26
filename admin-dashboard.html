@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>لوحة تحكم الإدارة - Eron Town</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+</head>
+
+<body class="bg-gray-900 text-white">
+    <custom-navbar></custom-navbar>
+
+    <main class="container mx-auto px-4 py-8">
+        <!-- العنوان -->
+        <section class="mb-8 flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-red-400">لوحة تحكم الإدارة</h1>
+            <a
+              href="logout.html"
+              id="logout-link"
+              class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors"
+            >
+                <i class="fas fa-sign-out-alt ml-2"></i>
+                تسجيل الخروج
+            </a>
+        </section>
+
+        <!-- زر خاص بالأونر -->
+        <div id="owner-button-container" class="mb-4"></div>
+
+        <!-- فلترة حسب المستخدم للأونر فقط -->
+        <div id="owner-filter-container" class="mb-6"></div>
+
+        <!-- سجلات الدخول والخروج -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-bold mb-4 text-green-400">تسجيلات الدخول</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full" id="login-table">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="px-4 py-2 text-right">المستخدم</th>
+                                <th class="px-4 py-2 text-right">الوقت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="login-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg p-6 shadow-lg">
+                <h2 class="text-xl font-bold mb-4 text-red-400">تسجيلات الخروج</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full" id="logout-table">
+                        <thead>
+                            <tr class="border-b border-gray-700">
+                                <th class="px-4 py-2 text-right">المستخدم</th>
+                                <th class="px-4 py-2 text-right">الوقت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logout-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // التحقق من تسجيل الدخول
+            const loggedInUser = localStorage.getItem("adminAuthToken");
+            if (!loggedInUser) {
+                window.location.href = "admin-login.html";
+            }
+
+            // جلب النشاطات
+            let loginActivities = JSON.parse(localStorage.getItem('loginActivities')) || [];
+            let logoutActivities = JSON.parse(localStorage.getItem('logoutActivities')) || [];
+
+            function updateLoginTable(filterUser = null) {
+                const tbody = document.getElementById('login-body');
+                tbody.innerHTML = '';
+                const data = filterUser ? loginActivities.filter(a => a.username === filterUser) : loginActivities;
+                data.forEach(act => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-700';
+                    row.innerHTML = `
+                        <td class="px-4 py-2">${act.username}</td>
+                        <td class="px-4 py-2">${act.time}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            function updateLogoutTable(filterUser = null) {
+                const tbody = document.getElementById('logout-body');
+                tbody.innerHTML = '';
+                const data = filterUser ? logoutActivities.filter(a => a.username === filterUser) : logoutActivities;
+                data.forEach(act => {
+                    const row = document.createElement('tr');
+                    row.className = 'border-b border-gray-700';
+                    row.innerHTML = `
+                        <td class="px-4 py-2">${act.username}</td>
+                        <td class="px-4 py-2">${act.time}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            function addLogin(username) {
+                const time = new Date().toLocaleString('en-US', { hour12: false });
+                loginActivities.unshift({ username, time });
+                if (loginActivities.length > 20) loginActivities.pop();
+                localStorage.setItem('loginActivities', JSON.stringify(loginActivities));
+                updateLoginTable();
+            }
+
+            function addLogout(username) {
+                const time = new Date().toLocaleString('en-US', { hour12: false });
+                logoutActivities.unshift({ username, time });
+                if (logoutActivities.length > 20) logoutActivities.pop();
+                localStorage.setItem('logoutActivities', JSON.stringify(logoutActivities));
+                updateLogoutTable();
+            }
+
+            // إضافة زر مسح اللوقات للأونر فقط
+            const ownerContainer = document.getElementById('owner-button-container');
+            if (loggedInUser === 'ahmed') {
+                const ownerBtn = document.createElement('button');
+                ownerBtn.textContent = "مسح كل اللوقات";
+                ownerBtn.className = "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded";
+                ownerBtn.addEventListener('click', () => {
+                    if (confirm("هل أنت متأكد من مسح كل سجلات الدخول والخروج؟")) {
+                        loginActivities = [];
+                        logoutActivities = [];
+                        localStorage.setItem('loginActivities', JSON.stringify(loginActivities));
+                        localStorage.setItem('logoutActivities', JSON.stringify(logoutActivities));
+                        updateLoginTable();
+                        updateLogoutTable();
+                        alert("تم مسح كل اللوقات بنجاح!");
+                    }
+                });
+                ownerContainer.appendChild(ownerBtn);
+
+                // إضافة فلترة المستخدمين للأونر
+                const ownerFilterContainer = document.getElementById('owner-filter-container');
+                ownerFilterContainer.innerHTML = `
+                    <div class="bg-gray-800 p-4 rounded mb-6 flex flex-col md:flex-row gap-4 items-center">
+                        <input
+                            type="text"
+                            id="search-username"
+                            placeholder="اكتب اسم المستخدم"
+                            class="px-4 py-2 rounded text-black w-full md:w-64"
+                        >
+                        <button
+                            id="filter-btn"
+                            class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded text-white"
+                        >
+                            عرض السجلات
+                        </button>
+                        <button
+                            id="reset-btn"
+                            class="bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded text-white"
+                        >
+                            عرض الكل
+                        </button>
+                    </div>
+                `;
+
+                // أحداث الأزرار
+                document.getElementById('filter-btn').addEventListener('click', () => {
+                    const username = document.getElementById('search-username').value.trim();
+                    if (!username) {
+                        alert("اكتب اسم المستخدم");
+                        return;
+                    }
+                    updateLoginTable(username);
+                    updateLogoutTable(username);
+                });
+
+                document.getElementById('reset-btn').addEventListener('click', () => {
+                    document.getElementById('search-username').value = '';
+                    updateLoginTable();
+                    updateLogoutTable();
+                });
+            }
+
+            // زر تسجيل الخروج
+            const logoutLink = document.getElementById('logout-link');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    addLogout(loggedInUser);
+                    localStorage.removeItem('adminAuthToken');
+                    window.location.href = "admin-login.html";
+                });
+            }
+
+            // تسجيل الدخول الحالي في الجداول
+            addLogin(loggedInUser);
+
+            // تحديث الجداول عند تحميل الصفحة
+            updateLoginTable();
+            updateLogoutTable();
+        </script>
+    </main>
+
+    <custom-footer></custom-footer>
+    <script src="components/navbar.js"></script>
+    <script src="components/footer.js"></script>
+</body>
+</html>
