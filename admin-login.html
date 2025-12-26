@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>الإدارة - Eron Town</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="header">الإدارة - Eron Town</div>
+
+    <div class="login-container">
+        <h2>تسجيل دخول الإدارة</h2>
+
+        <!-- رسالة الخطأ -->
+        <div id="error-msg" class="error hidden">
+            اسم المستخدم أو كلمة المرور غير صحيحة
+        </div>
+
+        <label>اسم المستخدم</label>
+        <input type="text" id="username">
+
+        <label>كلمة المرور</label>
+        <input type="password" id="password">
+
+        <button id="login-btn">دخول</button>
+    </div>
+
+    <div class="footer">© 2023 Eron Town - نظام الإدارة</div>
+
+    <script>
+        // حسابات الإدارة
+        const admins = [
+            {username: "ahmed", password: "ahmed123"},
+            {username: "rex", password: "rex123"}
+        ];
+
+        document.getElementById("login-btn").addEventListener("click", function () {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            const errorMsg = document.getElementById("error-msg");
+
+            // التحقق من صحة البيانات
+            const admin = admins.find(admin => admin.username === username && admin.password === password);
+
+            if (admin) {
+                // حفظ تسجيل الدخول في localStorage
+                localStorage.setItem("adminAuthToken", admin.username);
+
+                // التوجيه للداشبورد
+                window.location.href = "admin-dashboard.html";
+            } else {
+                // بيانات خاطئة
+                errorMsg.classList.remove("hidden");
+            }
+        });
+    </script>
+
+</body>
+</html>

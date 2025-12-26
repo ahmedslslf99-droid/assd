@@ -1,0 +1,84 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    background: #0b0b14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+/* العنوان العلوي */
+.header {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 18px;
+    color: #ff3333;
+}
+
+/* الصندوق */
+.login-container {
+    width: 420px;
+    background: #141424;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* العنوان */
+.login-container h2 {
+    margin-bottom: 25px;
+    color: #ff3333;
+    font-size: 22px;
+}
+
+/* النصوص */
+.login-container label {
+    display: block;
+    text-align: right;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #ddd;
+}
+
+/* الحقول */
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    background: #0e0e1a;
+    border: 1px solid #2a2a40;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+}
+
+/* زر الدخول */
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background: #e60000;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.login-container button:hover {
+    background: #ff1a1a;
+}
+
+/* الفوتر */
+.footer {
+    position: absolute;
+    bottom: 20px;
+    font-size: 13px;
+    color: #aaa;
+}
